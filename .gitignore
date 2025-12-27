@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+data/
+models/*.pkl
+models/*.json
+outputs/training.log
+.DS_Store
