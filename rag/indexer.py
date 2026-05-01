@@ -20,7 +20,10 @@ def build_index(force_rebuild=False):
     from rag.documents import THYROID_LITERATURE
 
     os.makedirs(DB_PATH, exist_ok=True)
-    client = chromadb.PersistentClient(path=DB_PATH)
+    try:
+        client = chromadb.PersistentClient(path=DB_PATH)
+    except Exception:
+        client = chromadb.EphemeralClient()
 
     collection_name = "thyroid_literature"
 

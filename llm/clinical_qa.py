@@ -1,117 +1,88 @@
 """
 RAG-powered clinical Q&A for thyroid disease.
-
-Usage:
-    qa = ClinicalQA()
-    answer = qa.ask("What are early signs of hypothyroidism?")
 """
 import os
 import logging
-from typing import Optional
 from rag.retriever import ThyroidRetriever
 
 log = logging.getLogger(__name__)
 
-# Try Anthropic first, then OpenAI
-import os as _os
+LLM_PROVIDER = None
 try:
     import anthropic
-    if _os.environ.get("ANTHROPIC_API_KEY"):
+    if os.environ.get("ANTHROPIC_API_KEY"):
         LLM_PROVIDER = "anthropic"
 except ImportError:
     pass
-
 if not LLM_PROVIDER:
     try:
         import openai
-        if _os.environ.get("OPENAI_API_KEY"):
+        if os.environ.get("OPENAI_API_KEY"):
             LLM_PROVIDER = "openai"
     except ImportError:
         pass
 
 
 class ClinicalQA:
-    """RAG-powered clinical question answering."""
-
     def __init__(self):
         self.retriever = ThyroidRetriever()
         self.provider = LLM_PROVIDER
+        self.client = None
         if self.provider == "anthropic":
-            self.client = anthropic.Anthropic(
-                api_key=os.environ.get("ANTHROPIC_API_KEY", "")
-            )
+            import anthropic as _a
+            self.client = _a.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         elif self.provider == "openai":
-            self.client = openai.OpenAI(
-                api_key=os.environ.get("OPENAI_API_KEY", "")
-            )
+            import openai as _o
+            self.client = _o.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-    def ask(self, question: str, n_sources: int = 3) -> dict:
-        """
-        Answer a clinical question using RAG.
+    def ask(self, question, n_sources=3):
+        if not question or not question.strip():
+            return {"question": question, "answer": "Please enter a question.", "sources": []}
 
-        Args:
-            question: Clinical question about thyroid disease
-            n_sources: Number of literature sources to retrieve
-
-        Returns:
-            Dict with answer, sources, and context
-        """
         sources = self.retriever.search(question, n_results=n_sources)
         context = self.retriever.get_context(question, n_results=n_sources)
 
-        prompt = f"""You are a clinical knowledge assistant specializing in thyroid disease.
-Answer the following question using ONLY the provided medical literature.
-If the literature does not contain relevant information, say so.
-Always cite your sources using [1], [2], etc.
+        prompt = f"""You are a clinical knowledge assistant for thyroid disease.
+Answer using ONLY the provided literature. Cite sources as [1], [2], etc.
 
 QUESTION: {question}
 
-MEDICAL LITERATURE:
+LITERATURE:
 {context}
 
-Provide a concise, clinically accurate answer (3-5 sentences). Cite sources."""
+Concise answer (3-5 sentences) with citations."""
 
-        if self.provider == "anthropic":
-            answer = self._call_anthropic(prompt)
-        elif self.provider == "openai":
-            answer = self._call_openai(prompt)
-        else:
-            answer = self._fallback(question, sources)
+        answer = None
+        if self.provider and self.client:
+            try:
+                if self.provider == "anthropic":
+                    r = self.client.messages.create(
+                        model="claude-sonnet-4-20250514", max_tokens=300,
+                        messages=[{"role": "user", "content": prompt}])
+                    answer = r.content[0].text
+                else:
+                    r = self.client.chat.completions.create(
+                        model="gpt-4o-mini", max_tokens=300,
+                        messages=[{"role": "user", "content": prompt}])
+                    answer = r.choices[0].message.content
+            except Exception as e:
+                log.warning(f"LLM failed: {e}")
+
+        if not answer:
+            answer = self._fallback(sources)
 
         return {
             "question": question,
             "answer": answer,
-            "sources": [
-                {"title": s["title"], "source": s["source"]}
-                for s in sources
-            ],
+            "sources": [{"title": s["title"], "source": s["source"]} for s in sources],
         }
 
-    def _call_anthropic(self, prompt: str) -> str:
-        try:
-            response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=300,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return response.content[0].text
-        except Exception as e:
-            return f"[LLM unavailable: {e}]"
-
-    def _call_openai(self, prompt: str) -> str:
-        try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                max_tokens=300,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"[LLM unavailable: {e}]"
-
-    def _fallback(self, question, sources):
-        """Return retrieved context without LLM generation."""
-        lines = [f"Retrieved {len(sources)} relevant sources:\n"]
-        for s in sources:
-            lines.append(f"- {s['title']} ({s['source']}): {s['text'][:200]}...")
-        return "\n".join(lines)
+    def _fallback(self, sources):
+        if not sources:
+            return "No relevant medical literature found for this question."
+        parts = []
+        for i, s in enumerate(sources, 1):
+            sentences = s["text"].split(". ")
+            excerpt = ". ".join(sentences[:2]) + "."
+            parts.append(f"**[{i}]** {excerpt}")
+        return "Based on the indexed medical literature:\n\n" + "\n\n".join(parts)

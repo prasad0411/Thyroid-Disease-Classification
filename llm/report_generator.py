@@ -110,7 +110,8 @@ class ClinicalReportGenerator:
 
     def _shap_template(self, patient_data, prediction, confidence, shap_values, ref_ranges):
         tsh, t3, t4 = patient_data.get("TSH", 0), patient_data.get("T3", 0), patient_data.get("T4", 0)
-        top3 = sorted(shap_values.items(), key=lambda x: abs(x[1]), reverse=True)[:3]
+        top_sorted = sorted(shap_values.items(), key=lambda x: abs(x[1]), reverse=True)[:3]
+        top3 = top_sorted + [('N/A', 0.0)] * max(0, 3 - len(top_sorted))
 
         report = f"""**CLINICAL REPORT — Thyroid Function Assessment**\n\n**1. CLINICAL SUMMARY**\n\nThe ML model predicts **{prediction.upper()}** with **{confidence:.1%}** confidence.\nKey lab values: TSH={tsh:.2f} mIU/L, T3={t3:.2f} ng/dL, T4={t4:.1f} nmol/L.\n\n**2. KEY CONTRIBUTING FEATURES (SHAP)**\n\n"""
         for name, value in top3:

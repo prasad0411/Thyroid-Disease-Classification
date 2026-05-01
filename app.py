@@ -167,9 +167,13 @@ def load_model():
         st.error("No trained model found. Run `python train.py` first.")
         st.stop()
     timestamp = meta_files[0].replace("metadata_", "").replace(".json", "")
-    model = joblib.load(f"{models_dir}/best_model_{timestamp}.pkl")
-    scaler = joblib.load(f"{models_dir}/scaler_{timestamp}.pkl")
-    label_encoder = joblib.load(f"{models_dir}/label_encoder_{timestamp}.pkl")
+    try:
+        model = joblib.load(f"{models_dir}/best_model_{timestamp}.pkl")
+        scaler = joblib.load(f"{models_dir}/scaler_{timestamp}.pkl")
+        label_encoder = joblib.load(f"{models_dir}/label_encoder_{timestamp}.pkl")
+    except Exception as e:
+        st.error(f"Failed to load model: {e}. Run `python train.py` to retrain.")
+        st.stop()
     with open(f"{models_dir}/metadata_{timestamp}.json") as f:
         metadata = json.load(f)
     # Extract XGBoost for SHAP
@@ -542,7 +546,7 @@ if page == "🔬 Predict & Explain":
                 )
                 if "[LLM unavailable" in report:
                     report = report_gen.generate_from_data(patient, prediction, confidence, REF_RANGES)
-                st.markdown(f'<div class="clinical-report">{report}</div>', unsafe_allow_html=True)
+                st.markdown(report)
 
                 # PDF export
                 report_text = f"THYROID CLINICAL REPORT\nDate: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n{report}"
@@ -564,6 +568,9 @@ elif page == "📚 Clinical Q&A":
     if "qa_history" not in st.session_state:
         st.session_state.qa_history = []
 
+    if "qa_question" not in st.session_state:
+        st.session_state.qa_question = ""
+
     examples = [
         "What causes elevated TSH levels?",
         "How does SMOTE improve thyroid classification?",
@@ -576,13 +583,18 @@ elif page == "📚 Clinical Q&A":
     ]
 
     col_q, col_ex = st.columns([2, 1])
-    with col_q:
-        question = st.text_input("Ask a clinical question:", placeholder="e.g., What causes elevated TSH?")
     with col_ex:
         st.markdown("**Quick questions:**")
         for ex in examples[:4]:
             if st.button(ex, key=f"ex_{ex}", use_container_width=True):
-                question = ex
+                st.session_state.qa_question = ex
+                st.rerun()
+    with col_q:
+        question = st.text_input(
+            "Ask a clinical question:",
+            value=st.session_state.qa_question,
+            placeholder="e.g., What causes elevated TSH?",
+        )
 
     if question:
         qa = load_qa()
@@ -717,7 +729,28 @@ elif page == "📁 Batch Prediction":
 
     uploaded = st.file_uploader("Upload patient CSV", type=["csv"])
     if uploaded:
-        df = pd.read_csv(uploaded)
+        try:
+            df = pd.read_csv(uploaded)
+        except Exception as e:
+            st.error(f"Could not read CSV: {e}")
+            df = pd.DataFrame()
+
+        if df.empty:
+            st.warning("The uploaded CSV is empty or could not be parsed.")
+            df = None
+
+        if df is not None:
+            required = ["TSH", "T3", "T4"]
+            missing_req = [c for c in required if c not in df.columns]
+            if missing_req:
+                st.error(f"Missing required columns: {', '.join(missing_req)}")
+                df = None
+
+        if df is not None:
+            for col in df.columns:
+                if col in features:
+                    df[col] = pd.to_numeric(df[col], errors="coerce")
+            df = df.fillna(0)
         st.markdown(f"**Loaded {len(df)} patients**")
         st.dataframe(df.head(), use_container_width=True)
 
@@ -727,10 +760,12 @@ elif page == "📁 Batch Prediction":
                 if f not in df.columns:
                     if f == "FTI" and "T4" in df.columns and "T4U" in df.columns:
                         df["FTI"] = df["T4"] / (df["T4U"] + 0.01)
+                    elif f == "T4U":
+                        df[f] = 1.0
                     else:
                         df[f] = 0
 
-            input_df = df[features]
+            input_df = df[features].fillna(0)
             input_scaled = scaler.transform(input_df)
             predictions = model.predict(input_scaled)
             probas = model.predict_proba(input_scaled)
