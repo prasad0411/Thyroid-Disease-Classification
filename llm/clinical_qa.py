@@ -13,15 +13,21 @@ from rag.retriever import ThyroidRetriever
 log = logging.getLogger(__name__)
 
 # Try Anthropic first, then OpenAI
+import os as _os
 try:
     import anthropic
-    LLM_PROVIDER = "anthropic"
+    if _os.environ.get("ANTHROPIC_API_KEY"):
+        LLM_PROVIDER = "anthropic"
 except ImportError:
+    pass
+
+if not LLM_PROVIDER:
     try:
         import openai
-        LLM_PROVIDER = "openai"
+        if _os.environ.get("OPENAI_API_KEY"):
+            LLM_PROVIDER = "openai"
     except ImportError:
-        LLM_PROVIDER = None
+        pass
 
 
 class ClinicalQA:
