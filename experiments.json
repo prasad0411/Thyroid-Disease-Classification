@@ -1,0 +1,106 @@
+[
+  {
+    "experiment_id": "exp_001",
+    "timestamp": "2024-12-15T10:30:00",
+    "description": "Baseline XGBoost without SMOTE",
+    "model": "XGBoost",
+    "hyperparameters": {
+      "n_estimators": 100,
+      "max_depth": 6,
+      "learning_rate": 0.1,
+      "subsample": 0.8
+    },
+    "features": 19,
+    "feature_selection": "None",
+    "class_balancing": "None",
+    "accuracy": 0.943,
+    "f1_macro": 0.87,
+    "minority_recall": 0.68,
+    "training_samples": 7200,
+    "training_time_sec": 12,
+    "notes": "Strong accuracy but poor minority class recall due to 3:1 class imbalance"
+  },
+  {
+    "experiment_id": "exp_002",
+    "timestamp": "2024-12-20T14:15:00",
+    "description": "XGBoost with SMOTE oversampling",
+    "model": "XGBoost",
+    "hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": 6,
+      "learning_rate": 0.1,
+      "subsample": 0.8
+    },
+    "features": 19,
+    "feature_selection": "None",
+    "class_balancing": "SMOTE",
+    "accuracy": 0.961,
+    "f1_macro": 0.93,
+    "minority_recall": 0.89,
+    "training_samples": 7200,
+    "training_time_sec": 18,
+    "notes": "SMOTE significantly improved minority recall from 68% to 89%"
+  },
+  {
+    "experiment_id": "exp_003",
+    "timestamp": "2025-01-10T09:00:00",
+    "description": "XGBoost + SMOTE + RFE feature selection",
+    "model": "XGBoost",
+    "hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": 6,
+      "learning_rate": 0.1,
+      "subsample": 0.8
+    },
+    "features": 12,
+    "feature_selection": "RFE (19 → 12 features)",
+    "class_balancing": "SMOTE",
+    "accuracy": 0.968,
+    "f1_macro": 0.94,
+    "minority_recall": 0.91,
+    "training_samples": 7200,
+    "training_time_sec": 15,
+    "notes": "RFE reduced features by 37% while improving accuracy — removed noisy features"
+  },
+  {
+    "experiment_id": "exp_004",
+    "timestamp": "2025-02-05T16:30:00",
+    "description": "Random Forest with SMOTE + RFE",
+    "model": "RandomForest",
+    "hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": null,
+      "min_samples_split": 5
+    },
+    "features": 12,
+    "feature_selection": "RFE",
+    "class_balancing": "SMOTE",
+    "accuracy": 0.964,
+    "f1_macro": 0.93,
+    "minority_recall": 0.90,
+    "training_samples": 7200,
+    "training_time_sec": 22,
+    "notes": "Slightly lower than XGBoost but better calibrated probabilities"
+  },
+  {
+    "experiment_id": "exp_005",
+    "timestamp": "2026-04-28T23:03:51",
+    "description": "Ensemble (XGBoost + RandomForest soft voting) — FINAL",
+    "model": "VotingClassifier (Ensemble)",
+    "hyperparameters": {
+      "voting": "soft",
+      "xgb_n_estimators": 200,
+      "xgb_max_depth": 6,
+      "rf_n_estimators": 200
+    },
+    "features": 12,
+    "feature_selection": "RFE (19 → 12)",
+    "class_balancing": "SMOTE",
+    "accuracy": 0.976,
+    "f1_macro": 0.95,
+    "minority_recall": 0.93,
+    "training_samples": 7200,
+    "training_time_sec": 45,
+    "notes": "Soft voting ensemble combines strengths of both models. Deployed to Streamlit Cloud with RAG + SHAP + LLM reports."
+  }
+]
