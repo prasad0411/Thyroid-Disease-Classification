@@ -766,6 +766,30 @@ elif page == "📁 Batch Prediction":
                         df[f] = 0
 
             input_df = df[features].fillna(0)
+
+            # ── Data Drift Detection ──
+            train_df_drift = load_training_data()
+            if train_df_drift is not None:
+                drift_warnings = []
+                for col in ["TSH", "T3", "T4"]:
+                    if col in input_df.columns and col in train_df_drift.columns:
+                        train_mean = train_df_drift[col].mean()
+                        train_std = train_df_drift[col].std()
+                        input_mean = input_df[col].mean()
+                        if train_std > 0:
+                            z = abs(input_mean - train_mean) / train_std
+                            if z > 2.0:
+                                drift_warnings.append(
+                                    f"**{col}**: uploaded mean ({input_mean:.2f}) is "
+                                    f"{z:.1f}σ from training mean ({train_mean:.2f})"
+                                )
+                if drift_warnings:
+                    st.warning(
+                        "⚠️ **Data Distribution Warning**: Some features differ "
+                        "significantly from training data. Predictions may be less reliable.\n\n"
+                        + "\n".join(f"- {w}" for w in drift_warnings)
+                    )
+
             input_scaled = scaler.transform(input_df)
             predictions = model.predict(input_scaled)
             probas = model.predict_proba(input_scaled)
