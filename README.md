@@ -11,51 +11,29 @@ A production-grade ML system for thyroid disease classification combining an ens
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     PATIENT DATA INPUT                       │
-│     Lab values (TSH, T3, T4, T4U) + Demographics + History  │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-              ┌────────────▼────────────────┐
-              │    Feature Engineering       │
-              │    RFE: 19 → 12 features    │
-              │    SMOTE: 3:1 → 1:1 balance │
-              └────────────┬────────────────┘
-                           │
-         ┌─────────────────▼──────────────────┐
-         │    Ensemble Classifier              │
-         │    XGBoost + Random Forest          │
-         │    Soft Voting · 97.6% accuracy     │
-         └──────────┬──────────────┬──────────┘
-                    │              │
-         ┌──────────▼───┐  ┌──────▼──────────────┐
-         │  Prediction   │  │  SHAP Explainer      │
-         │  + Confidence │  │  Per-feature values   │
-         └──────┬───────┘  └──────┬───────────────┘
-                │                 │
-         ┌──────▼─────────────────▼──────────────┐
-         │    Counterfactual Analysis             │
-         │    "What would flip the diagnosis?"    │
-         └──────────────────┬────────────────────┘
-                            │
-         ┌──────────────────▼────────────────────┐
-         │    RAG Retrieval                       │
-         │    ChromaDB + 25 medical documents     │
-         │    Semantic search for clinical context│
-         └──────────────────┬────────────────────┘
-                            │
-         ┌──────────────────▼────────────────────┐
-         │    Clinical Report Generator           │
-         │    LLM-powered (Claude/GPT-4)          │
-         │    Template fallback when no API key   │
-         └──────────────────┬────────────────────┘
-                            │
-         ┌──────────────────▼────────────────────┐
-         │    Streamlit Dashboard (5 pages)       │
-         │    Predict · Q&A · Performance ·       │
-         │    Batch · About                       │
-         └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Patient Data Input
+Lab values TSH, T3, T4, T4U
+Demographics + History"] --> B["Feature Engineering
+RFE: 19 to 12 features
+SMOTE: 3:1 to 1:1 balance"]
+    B --> C["Ensemble Classifier
+XGBoost + Random Forest
+Soft Voting · 97.6% accuracy"]
+    C --> D["Prediction + Confidence"]
+    C --> E["SHAP Explainer
+Per-feature values"]
+    D --> F["Counterfactual Analysis
+What would flip the diagnosis?"]
+    E --> F
+    F --> G["RAG Retrieval
+ChromaDB + 25 medical documents"]
+    G --> H["Clinical Report Generator
+LLM-powered with template fallback"]
+    H --> I["Streamlit Dashboard
+Predict · Q&A · Performance
+Batch · About"]
 ```
 
 ## ✨ Features
