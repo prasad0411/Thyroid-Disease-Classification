@@ -13,7 +13,7 @@ def generate_medical_dataset(n_samples=N_SAMPLES):
     Generate realistic thyroid disease dataset with medical feature correlations.
     
     Dataset Characteristics:
-    - Sample size: 7,200 patient records
+    - Sample size: 57,250 patient records
     - Features: 19 clinical and demographic attributes
     - Target classes: 3 (Negative, Hypothyroid, Hyperthyroid)
     - Class distribution: Imbalanced (reflecting real-world prevalence)

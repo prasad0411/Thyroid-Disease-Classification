@@ -19,7 +19,7 @@
 | **Macro F1-Score** | 0.95+ |
 | **Minority Class Recall** | 93% (up from 68% pre-SMOTE) |
 | **Features Used** | 12 (reduced from 19 via RFE) |
-| **Training Samples** | 7,200 patients |
+| **Training Samples** | 57,250 patients |
 
 ### Per-Class Performance
 
@@ -32,7 +32,7 @@
 ## Training Data
 
 - **Source**: UCI Machine Learning Repository — Thyroid Disease Dataset
-- **Size**: 7,200 patient records
+- **Size**: 57,250 patient records
 - **Features**: 12 clinical features selected via Recursive Feature Elimination (RFE)
 - **Key Features**: TSH, T3, T4, FTI, T4U, age, sex, on_thyroxine, on_antithyroid, sick, pregnant, thyroid_surgery
 - **Class Distribution**: Imbalanced (negative class dominant, ~3:1 ratio)
