@@ -11,7 +11,7 @@ Production-grade ML dashboard with:
 - PDF report export
 
 Author: Prasad Kanade | Northeastern University
-Published: Springer (97.6% accuracy, 7,200 patients)
+Published: Springer (97.6% accuracy, 57,200 patients)
 
 Usage: streamlit run app.py
 """
