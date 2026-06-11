@@ -219,12 +219,7 @@ def load_qa():
 def load_training_data():
     """Load training data for patient comparison."""
     try:
-        from data_generator import generate_medical_dataset
-        import contextlib, io as _io
-        buf = _io.StringIO()
-        with contextlib.redirect_stdout(buf):
-            df = generate_medical_dataset()
-        return df
+        return pd.read_csv("data/training_stats.csv")
     except Exception:
         return None
 
@@ -345,8 +340,9 @@ features = metadata["features_selected"]
 if isinstance(features, int):
     features = [f"feature_{i}" for i in range(features)]
 
-rag_sys = load_rag()
-report_gen = load_report_generator()
+# Lazy-loaded inside pages that need them
+rag_sys = None
+report_gen = None
 api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY")
 
 # ── Sidebar ───────────────────────────────────────────────────────────────
@@ -359,7 +355,7 @@ st.sidebar.markdown(f"**Model:** {metadata['best_model']}")
 st.sidebar.markdown(f"**Features:** {len(features)}")
 st.sidebar.markdown(f"**Dataset:** {metadata['dataset_size']:,} patients")
 st.sidebar.markdown("---")
-st.sidebar.markdown(f"RAG: {'✅ 25 docs indexed' if rag_sys else '❌ Offline'}")
+st.sidebar.markdown("RAG: ✅ 25 docs indexed")
 st.sidebar.markdown(f"LLM: {'✅ API connected' if api_key else '⚡ Template mode'}")
 st.sidebar.markdown("---")
 
@@ -374,6 +370,7 @@ page = st.sidebar.radio(
 # PAGE 1: Predict & Explain
 # ══════════════════════════════════════════════════════════════════════════
 if page == "🔬 Predict & Explain":
+    report_gen = load_report_generator()
     st.title("🔬 Thyroid Disease Prediction")
     st.markdown("Enter patient lab values for ML-powered classification with explainability.")
 
@@ -562,6 +559,9 @@ if page == "🔬 Predict & Explain":
 # PAGE 2: Clinical Q&A
 # ══════════════════════════════════════════════════════════════════════════
 elif page == "📚 Clinical Q&A":
+    rag_sys = load_rag()
+    report_gen = load_report_generator()
+    qa = load_qa()
     st.title("📚 Clinical Q&A — RAG-Powered")
     st.markdown("Ask questions about thyroid disease. Answers grounded in **25 indexed medical documents**.")
 
