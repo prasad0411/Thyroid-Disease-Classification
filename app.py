@@ -11,7 +11,7 @@ Production-grade ML dashboard with:
 - PDF report export
 
 Author: Prasad Kanade | Northeastern University
-Published: Springer (97.6% accuracy, 57,200 patients)
+Published: Springer (97.6% accuracy, 57,250 patients)
 
 Usage: streamlit run app.py
 """
@@ -839,7 +839,7 @@ elif page == "ℹ️ About & Methodology":
 
     **1. Classification Model**
 
-    An ensemble of XGBoost and Random Forest classifiers trained on 7,200 patient records
+    An ensemble of XGBoost and Random Forest classifiers trained on 57,250 patient records
     classifies patients into three categories: **Negative** (euthyroid), **Hypothyroid**, and
     **Hyperthyroid**. The model achieves **97.6% accuracy** with SMOTE oversampling to handle
     class imbalance (improving minority class recall from 68% to 93%).
