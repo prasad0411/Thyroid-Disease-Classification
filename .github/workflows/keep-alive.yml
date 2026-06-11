@@ -3,11 +3,29 @@ name: Keep Streamlit Alive
 on:
   schedule:
     - cron: '0 */2 * * *'
-  workflow_dispatch:  # allows manual "Run workflow" button
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping app
-        run: curl -s -o /dev/null -w "%{http_code}" https://thyroid-disease-classification.streamlit.app/
+      - name: Wake Streamlit app
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install and run Playwright
+        run: |
+          npm init -y
+          npm i playwright
+          npx playwright install chromium --with-deps
+          node -e "
+            const { chromium } = require('playwright');
+            (async () => {
+              const browser = await chromium.launch();
+              const page = await browser.newPage();
+              await page.goto('https://thyroid-disease-classification.streamlit.app/', { waitUntil: 'networkidle', timeout: 120000 });
+              console.log('Page loaded:', await page.title());
+              await page.waitForTimeout(10000);
+              await browser.close();
+            })();
+          "
