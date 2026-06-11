@@ -1,4 +1,19 @@
-- name: Install and run Playwright
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake Streamlit apps
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install and run Playwright
         run: |
           npm init -y
           npm i playwright
@@ -21,6 +36,7 @@
                   await wakeBtn.click();
                   await page.waitForTimeout(30000);
                 }
+                await page.waitForTimeout(10000);
                 console.log('Done:', url);
               }
               await browser.close();
