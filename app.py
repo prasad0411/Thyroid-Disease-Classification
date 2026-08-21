@@ -380,7 +380,7 @@ if page == "Predict & Explain":
     col_input, col_result = st.columns([1, 1], gap="large")
 
     with col_input:
-        st.markdown("#### 🧪 Lab Values")
+        st.markdown("#### Lab Values")
         patient = {}
         patient["TSH"] = st.slider("TSH (mIU/L)", 0.01, 50.0, pv.get("TSH", 2.5), 0.1,
                                    help="Normal: 0.4-4.0 mIU/L")
@@ -398,13 +398,13 @@ if page == "Predict & Explain":
         patient["T4U"] = st.slider("T4 Uptake", 0.5, 1.8, pv.get("T4U", 1.0), 0.05)
         patient["FTI"] = patient["T4"] / (patient["T4U"] + 0.01)
 
-        st.markdown("#### 👤 Demographics")
+        st.markdown("#### Demographics")
         c1, c2 = st.columns(2)
         patient["age"] = c1.slider("Age", 18, 90, pv.get("age", 45))
         patient["sex"] = c2.selectbox("Sex", [0, 1], index=pv.get("sex", 0),
                                        format_func=lambda x: "Female" if x == 0 else "Male")
 
-        st.markdown("#### 💊 Medical History")
+        st.markdown("#### Medical History")
         c3, c4 = st.columns(2)
         patient["on_thyroxine"] = c3.selectbox("On Thyroxine?", [0, 1],
                                                 index=pv.get("on_thyroxine", 0),
@@ -425,7 +425,7 @@ if page == "Predict & Explain":
         if f not in patient:
             patient[f] = 0
 
-    predict_btn = st.button("🔍 Analyze Patient", type="primary", use_container_width=True)
+    predict_btn = st.button("Analyze Patient", type="primary", use_container_width=True)
 
     if predict_btn:
         input_df = pd.DataFrame([{f: patient.get(f, 0) for f in features}])
@@ -451,7 +451,7 @@ if page == "Predict & Explain":
             st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
             # SHAP
-            st.markdown("#### 🔎 Feature Contributions (SHAP)")
+            st.markdown("#### Feature Contributions (SHAP)")
             shap_dict = get_shap_values(xgb_model, input_scaled, features, prediction_idx)
 
             if shap_dict and any(abs(v) > 0.001 for v in shap_dict.values()):
@@ -486,7 +486,7 @@ if page == "Predict & Explain":
             st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
             # Differential / Counterfactual
-            st.markdown("#### 🔄 Differential Analysis")
+            st.markdown("#### Differential Analysis")
             st.markdown("*What would need to change for a different diagnosis?*")
             cfs = compute_counterfactuals(model, scaler, label_encoder, features, patient, prediction)
             if cfs:
@@ -505,7 +505,7 @@ if page == "Predict & Explain":
             st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
             # Patient comparison
-            st.markdown("#### 📊 Patient vs Population")
+            st.markdown("#### Patient vs Population")
             train_df = load_training_data()
             if train_df is not None:
                 class_data = train_df[train_df["target"] == prediction]
@@ -528,7 +528,7 @@ if page == "Predict & Explain":
             st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
             # Clinical Report
-            st.markdown("#### 📋 Clinical Report")
+            st.markdown("#### Clinical Report")
             rag_context = ""
             if rag_sys:
                 rag_context = rag_sys.get_context(
