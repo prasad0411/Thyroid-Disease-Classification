@@ -11,7 +11,7 @@ Production-grade ML dashboard with:
 - PDF report export
 
 Author: Prasad Kanade | Northeastern University
-Published: Springer (97.6% accuracy, 57,250 patients)
+Published: Springer (97.3% held-out accuracy, 150,000 synthetic records)
 
 Usage: streamlit run app.py
 """
@@ -859,7 +859,7 @@ elif page == "About & Methodology":
     ### Thyroid Disease Classification — Clinical Decision Support System
 
     This system uses machine learning to assist clinicians in thyroid disease diagnosis.
-    It combines a high-accuracy ensemble classifier with explainable AI and retrieval-augmented
+    It combines a high-accuracy Random Forest classifier with explainable AI and retrieval-augmented
     generation to provide transparent, evidence-based clinical decision support.
 
     ---
@@ -868,9 +868,9 @@ elif page == "About & Methodology":
 
     **1. Classification Model**
 
-    An ensemble of XGBoost and Random Forest classifiers trained on 57,250 patient records
+    A Random Forest classifier, selected over XGBoost and a soft-voting ensemble by held-out F1, trained on 150,000 synthetic records
     classifies patients into three categories: **Negative** (euthyroid), **Hypothyroid**, and
-    **Hyperthyroid**. The model achieves **97.6% accuracy** with SMOTE oversampling to handle
+    **Hyperthyroid**. The model achieves **97.3% held-out accuracy** with SMOTE oversampling to handle
     class imbalance (improving minority class recall from 68% to 93%).
 
     **2. Feature Selection**
