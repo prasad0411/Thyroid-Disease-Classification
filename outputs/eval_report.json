@@ -1,0 +1,176 @@
+{
+  "timestamp": "20260821_085512",
+  "note": "RFE fit on training fold only (no leakage)",
+  "selected_features": [
+    "age",
+    "sex",
+    "TSH",
+    "T3",
+    "T4",
+    "T4U",
+    "FTI",
+    "on_thyroxine",
+    "on_antithyroid",
+    "sick",
+    "query_hypothyroid",
+    "query_hyperthyroid"
+  ],
+  "models": {
+    "XGBoost": {
+      "accuracy": 0.9726123104869698,
+      "log_loss": 0.11228956282138824,
+      "per_class": {
+        "hyperthyroid": {
+          "precision": 0.9586809694080254,
+          "recall": 0.9848979591836735,
+          "f1-score": 0.9716126434467486,
+          "support": 2450.0
+        },
+        "hypothyroid": {
+          "precision": 0.9353562005277045,
+          "recall": 0.9639700883752549,
+          "f1-score": 0.9494476062939404,
+          "support": 2942.0
+        },
+        "negative": {
+          "precision": 0.9895025102692835,
+          "recall": 0.9720883309046071,
+          "f1-score": 0.9807181227028555,
+          "support": 8921.0
+        }
+      },
+      "calibration_brier": {
+        "hyperthyroid": {
+          "brier": 0.009062669239938259
+        },
+        "hypothyroid": {
+          "brier": 0.0181001964956522
+        },
+        "negative": {
+          "brier": 0.02029198780655861
+        }
+      },
+      "confusion_matrix": [
+        [
+          2413,
+          19,
+          18
+        ],
+        [
+          32,
+          2836,
+          74
+        ],
+        [
+          72,
+          177,
+          8672
+        ]
+      ]
+    },
+    "RandomForest": {
+      "accuracy": 0.9728219101516105,
+      "log_loss": 0.11689439418185348,
+      "per_class": {
+        "hyperthyroid": {
+          "precision": 0.9602069239952248,
+          "recall": 0.9848979591836735,
+          "f1-score": 0.9723957283900866,
+          "support": 2450.0
+        },
+        "hypothyroid": {
+          "precision": 0.9336181399934276,
+          "recall": 0.9656696125084976,
+          "f1-score": 0.9493734335839599,
+          "support": 2942.0
+        },
+        "negative": {
+          "precision": 0.9900650907845152,
+          "recall": 0.971864140791391,
+          "f1-score": 0.9808801900667496,
+          "support": 8921.0
+        }
+      },
+      "calibration_brier": {
+        "hyperthyroid": {
+          "brier": 0.009046132178527632
+        },
+        "hypothyroid": {
+          "brier": 0.01809701813180922
+        },
+        "negative": {
+          "brier": 0.020473640714594003
+        }
+      },
+      "confusion_matrix": [
+        [
+          2413,
+          19,
+          18
+        ],
+        [
+          32,
+          2841,
+          69
+        ],
+        [
+          68,
+          183,
+          8670
+        ]
+      ]
+    },
+    "Ensemble": {
+      "accuracy": 0.9723328442674491,
+      "log_loss": 0.1117525405289953,
+      "per_class": {
+        "hyperthyroid": {
+          "precision": 0.9594433399602386,
+          "recall": 0.9848979591836735,
+          "f1-score": 0.9720040281973816,
+          "support": 2450.0
+        },
+        "hypothyroid": {
+          "precision": 0.9332236842105263,
+          "recall": 0.9643099932019035,
+          "f1-score": 0.9485122032764961,
+          "support": 2942.0
+        },
+        "negative": {
+          "precision": 0.9896094998858187,
+          "recall": 0.9715278556215671,
+          "f1-score": 0.980485321567962,
+          "support": 8921.0
+        }
+      },
+      "calibration_brier": {
+        "hyperthyroid": {
+          "brier": 0.00893823713992527
+        },
+        "hypothyroid": {
+          "brier": 0.01785891600828669
+        },
+        "negative": {
+          "brier": 0.020028159803484748
+        }
+      },
+      "confusion_matrix": [
+        [
+          2413,
+          19,
+          18
+        ],
+        [
+          32,
+          2837,
+          73
+        ],
+        [
+          70,
+          184,
+          8667
+        ]
+      ]
+    }
+  }
+}
