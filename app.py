@@ -346,8 +346,8 @@ report_gen = None
 api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY")
 
 # ── Sidebar ───────────────────────────────────────────────────────────────
-st.sidebar.markdown("## 🧬 Thyroid CDSS")
-st.sidebar.markdown("Clinical Decision Support System")
+st.sidebar.markdown("### Thyroid CDSS")
+st.sidebar.caption("Clinical Decision Support System")
 st.sidebar.markdown("---")
 best_metrics = metadata["performance_metrics"][metadata["best_model"]]
 st.sidebar.metric("Model Accuracy", f"{best_metrics['accuracy']:.1%}")
@@ -355,23 +355,23 @@ st.sidebar.markdown(f"**Model:** {metadata['best_model']}")
 st.sidebar.markdown(f"**Features:** {len(features)}")
 st.sidebar.markdown(f"**Dataset:** {metadata['dataset_size']:,} patients")
 st.sidebar.markdown("---")
-st.sidebar.markdown("RAG: ✅ 25 docs indexed")
-st.sidebar.markdown(f"LLM: {'✅ API connected' if api_key else '⚡ Template mode'}")
+st.sidebar.caption("RAG index: 25 documents")
+st.sidebar.caption(f"LLM: {'API connected' if api_key else 'Template mode'}")
 st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
     "Navigate",
-    ["🔬 Predict & Explain", "📚 Clinical Q&A", "📊 Model Performance",
-     "📁 Batch Prediction", "ℹ️ About & Methodology"],
+    ["Predict & Explain", "Clinical Q&A", "Model Performance",
+     "Batch Prediction", "About & Methodology"],
 )
 
 
 # ══════════════════════════════════════════════════════════════════════════
 # PAGE 1: Predict & Explain
 # ══════════════════════════════════════════════════════════════════════════
-if page == "🔬 Predict & Explain":
+if page == "Predict & Explain":
     report_gen = load_report_generator()
-    st.title("🔬 Thyroid Disease Prediction")
+    st.title("Thyroid Disease Prediction")
     st.markdown("Enter patient lab values for ML-powered classification with explainability.")
 
     preset = st.selectbox("Quick-fill preset:", list(PRESET_PATIENTS.keys()))
@@ -558,11 +558,11 @@ if page == "🔬 Predict & Explain":
 # ══════════════════════════════════════════════════════════════════════════
 # PAGE 2: Clinical Q&A
 # ══════════════════════════════════════════════════════════════════════════
-elif page == "📚 Clinical Q&A":
+elif page == "Clinical Q&A":
     rag_sys = load_rag()
     report_gen = load_report_generator()
     qa = load_qa()
-    st.title("📚 Clinical Q&A — RAG-Powered")
+    st.title("Clinical Q&A")
     st.markdown("Ask questions about thyroid disease. Answers grounded in **25 indexed medical documents**.")
 
     if "qa_history" not in st.session_state:
@@ -650,8 +650,8 @@ elif page == "📚 Clinical Q&A":
 # ══════════════════════════════════════════════════════════════════════════
 # PAGE 3: Model Performance
 # ══════════════════════════════════════════════════════════════════════════
-elif page == "📊 Model Performance":
-    st.title("📊 Model Performance & Diagnostics")
+elif page == "Model Performance":
+    st.title("Model Performance")
 
     c1, c2, c3, c4 = st.columns(4)
     best = metadata["best_model"]
@@ -711,7 +711,7 @@ elif page == "📊 Model Performance":
 # ══════════════════════════════════════════════════════════════════════════
 # PAGE 4: Batch Prediction
 # ══════════════════════════════════════════════════════════════════════════
-elif page == "📁 Batch Prediction":
+elif page == "Batch Prediction":
     st.title("📁 Batch Prediction")
     st.markdown("Upload a CSV of patient data to get predictions for all patients at once.")
 
@@ -823,7 +823,7 @@ elif page == "📁 Batch Prediction":
 # ══════════════════════════════════════════════════════════════════════════
 # PAGE 5: About & Methodology
 # ══════════════════════════════════════════════════════════════════════════
-elif page == "ℹ️ About & Methodology":
+elif page == "About & Methodology":
     st.title("ℹ️ About This System")
 
     st.markdown("""
