@@ -1,22 +1,53 @@
 name: Keep Streamlit Alive
 on:
   schedule:
-    - cron: '0 13,15,17,19,21,23 * * 1-5'   # every 2h, 9am to 7pm ET weekdays (peak viewing)
-    - cron: '0 1,5 * * *'                   # overnight safety net
+    - cron: '*/30 * * * *'   # every 30 min (GitHub may delay 5 to 30 min under load)
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
+
       - name: Install and run Playwright
         run: |
           npm init -y
           npm i playwright
           npx playwright install chromium --with-deps
           node wake.js
+
+      - name: Keepalive to prevent 60 day auto disable
+        if: always()
+        run: |
+          LAST=$(git log -1 --format=%ct)
+          NOW=$(date +%s)
+          AGE_DAYS=$(( (NOW - LAST) / 86400 ))
+          echo "Days since last commit: $AGE_DAYS"
+          if [ "$AGE_DAYS" -ge 45 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            mkdir -p .github
+            date -u '+%Y-%m-%d %H:%M UTC' > .github/keepalive-heartbeat.txt
+            git add .github/keepalive-heartbeat.txt
+            git commit -m "chore: keepalive heartbeat [skip ci]"
+            git push
+            echo "Heartbeat committed, 60 day timer reset."
+          else
+            echo "Recent commit exists ($AGE_DAYS days old). No heartbeat needed."
+          fi
