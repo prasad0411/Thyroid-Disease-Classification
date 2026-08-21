@@ -1,15 +1,15 @@
 name: Keep Streamlit Alive
-
 on:
   schedule:
     - cron: '0 */2 * * *'
   workflow_dispatch:
-
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Wake Streamlit apps
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -18,27 +18,4 @@ jobs:
           npm init -y
           npm i playwright
           npx playwright install chromium --with-deps
-          node -e "
-            const { chromium } = require('playwright');
-            (async () => {
-              const browser = await chromium.launch();
-              const page = await browser.newPage();
-              const urls = [
-                'https://thyroid-disease-classification.streamlit.app/',
-                'https://job-scraping-analytics.streamlit.app/'
-              ];
-              for (const url of urls) {
-                console.log('Visiting:', url);
-                await page.goto(url, { waitUntil: 'networkidle', timeout: 120000 });
-                const wakeBtn = await page.\$('button:has-text(\"Yes, get this app back up\")');
-                if (wakeBtn) {
-                  console.log('App sleeping, clicking wake button...');
-                  await wakeBtn.click();
-                  await page.waitForTimeout(30000);
-                }
-                await page.waitForTimeout(10000);
-                console.log('Done:', url);
-              }
-              await browser.close();
-            })();
-          "
+          node wake.js
