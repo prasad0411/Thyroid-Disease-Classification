@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python)](https://python.org)
 [![Model Card](https://img.shields.io/badge/Model_Card-Responsible_AI-green)](/MODEL_CARD.md)
 
-A production-grade ML system for thyroid disease classification combining an ensemble classifier (97.6% accuracy), SHAP explainability, RAG-powered clinical Q&A, and an interactive Streamlit dashboard — published in Springer Conference Proceedings and deployed for real-time clinical decision support.
+A production-grade ML system for thyroid disease classification combining an Random Forest classifier (97.3% held-out accuracy), SHAP explainability, RAG-powered clinical Q&A, and an interactive Streamlit dashboard — published in Springer Conference Proceedings and deployed for real-time clinical decision support.
 
 ---
 
@@ -20,7 +20,7 @@ RFE: 19 to 12 features
 SMOTE: 3:1 to 1:1 balance"]
     B --> C["Ensemble Classifier
 XGBoost + Random Forest
-Soft Voting · 97.6% accuracy"]
+Soft Voting · 97.3% accuracy"]
     C --> D["Prediction + Confidence"]
     C --> E["SHAP Explainer
 Per-feature values"]
@@ -78,7 +78,8 @@ Batch · About"]
 | + SMOTE | XGBoost | 19 | Yes | 96.1% | 89% |
 | + RFE | XGBoost | 12 | Yes | 96.8% | 91% |
 | Random Forest | RF | 12 | Yes | 96.4% | 90% |
-| **Ensemble (Final)** | **XGB + RF** | **12** | **Yes** | **97.6%** | **93%** |
+| **Ensemble** | XGB + RF | 12 | Yes | 97.2% | 97% |
+| **Random Forest (Final)** | **RF** | **12** | **Yes** | **97.3%** | **97%** |
 
 Full experiment log with hyperparameters: [`experiments.json`](experiments.json)
 

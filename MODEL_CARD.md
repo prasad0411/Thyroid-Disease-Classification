@@ -4,7 +4,7 @@
 
 | Field | Details |
 |-------|---------|
-| **Model Type** | Ensemble (XGBoost + Random Forest, Soft Voting) |
+| **Model Type** | Random Forest (selected over XGBoost/Ensemble by held-out F1) |
 | **Task** | Multi-class classification (3 classes) |
 | **Classes** | Negative (euthyroid), Hypothyroid, Hyperthyroid |
 | **Framework** | scikit-learn, XGBoost |
@@ -15,11 +15,11 @@
 
 | Metric | Score |
 |--------|-------|
-| **Overall Accuracy** | 97.6% |
+| **Overall Accuracy** | 97.3% (leak-free held-out test set) |
 | **Macro F1-Score** | 0.95+ |
 | **Minority Class Recall** | 93% (up from 68% pre-SMOTE) |
 | **Features Used** | 12 (reduced from 19 via RFE) |
-| **Training Samples** | 57,250 patients |
+| **Training Samples** | 112,500 (of 150,000 synthetic records) |
 
 ### Per-Class Performance
 
@@ -32,7 +32,7 @@
 ## Training Data
 
 - **Source**: UCI Machine Learning Repository — Thyroid Disease Dataset
-- **Size**: 57,250 patient records
+- **Size**: 150,000 synthetic patient records (clinically-informed generator)
 - **Features**: 12 clinical features selected via Recursive Feature Elimination (RFE)
 - **Key Features**: TSH, T3, T4, FTI, T4U, age, sex, on_thyroxine, on_antithyroid, sick, pregnant, thyroid_surgery
 - **Class Distribution**: Imbalanced (negative class dominant, ~3:1 ratio)

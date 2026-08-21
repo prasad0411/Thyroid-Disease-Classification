@@ -109,6 +109,35 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
+    /* Motion: subtle, clinical */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .diagnosis-banner,
+    .patient-card,
+    .clinical-report,
+    .cf-card {
+        animation: fadeUp 0.35s ease-out both;
+    }
+    .patient-card, .cf-card {
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .patient-card:hover, .cf-card:hover {
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+    }
+    .stButton > button {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; }
+    }
+
     /* Counterfactual card */
     .cf-card {
         background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;
