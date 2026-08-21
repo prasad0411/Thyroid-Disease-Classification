@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python)](https://python.org)
 [![Model Card](https://img.shields.io/badge/Model_Card-Responsible_AI-green)](/MODEL_CARD.md)
 
-A production-grade ML system for thyroid disease classification combining an Random Forest classifier (97.3% held-out accuracy), SHAP explainability, RAG-powered clinical Q&A, and an interactive Streamlit dashboard — published in Springer Conference Proceedings and deployed for real-time clinical decision support.
+A production-grade ML system for thyroid disease classification combining a Random Forest classifier (97.3% held-out accuracy), SHAP explainability, RAG-powered clinical Q&A, and an interactive Streamlit dashboard — published in Springer Conference Proceedings and deployed for real-time clinical decision support.
 
 ---
 
@@ -18,9 +18,9 @@ Lab values TSH, T3, T4, T4U
 Demographics + History"] --> B["Feature Engineering
 RFE: 19 to 12 features
 SMOTE: 3:1 to 1:1 balance"]
-    B --> C["Ensemble Classifier
+    B --> C["Random Forest Classifier
 XGBoost + Random Forest
-Soft Voting · 97.3% accuracy"]
+Selected by held-out F1 · 97.3% accuracy"]
     C --> D["Prediction + Confidence"]
     C --> E["SHAP Explainer
 Per-feature values"]
@@ -114,7 +114,7 @@ Set `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` in Streamlit Cloud secrets for LLM-g
 ├── train.py                      # Model training pipeline
 ├── data_generator.py             # Dataset generation
 ├── models/                       # Versioned model artifacts
-│   ├── best_model_*.pkl          #   Trained ensemble
+│   ├── best_model_*.pkl          #   Trained classifier
 │   ├── scaler_*.pkl              #   Feature scaler
 │   ├── label_encoder_*.pkl       #   Label encoder
 │   └── metadata_*.json           #   Performance metrics + config
